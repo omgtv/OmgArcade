@@ -3,27 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retro Game Catalog</title>
+  <title>OMG ARCADE — Build Your Retro Game Collection</title>
+  <meta name="theme-color" content="#040404" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <div class="brand-wrap">
-      <div class="logo-mark">RG</div>
+    <a class="brand-wrap" href="#top" aria-label="OMG Arcade home">
+      <div class="logo-mark"><span>OMG</span></div>
       <div>
-        <div class="brand">Retro Game Catalog</div>
-        <div class="tagline">Choose your systems. Pick your games. Build your list.</div>
+        <div class="brand">OMG<span>ARCADE</span></div>
+        <div class="tagline">RETRO COLLECTION BUILDER</div>
       </div>
-    </div>
-    <button id="orderBtn" class="order-btn">My Selection <span id="orderCount" class="badge">0</span></button>
+    </a>
+    <nav class="topnav" aria-label="Main navigation">
+      <a href="#packages">Packages</a>
+      <a href="#systems">Systems</a>
+      <a href="#builder">Build Yours</a>
+    </nav>
+    <button id="orderBtn" class="order-btn">MY SELECTION <span id="orderCount" class="badge">0</span></button>
   </header>
 
-  <section class="storefront">
+  <section id="top" class="storefront">
     <div class="storefront-inner">
+      <canvas id="matrixCanvas" class="matrix-canvas" aria-hidden="true"></canvas>
+      <div class="hero-overlay"></div>
       <div class="storefront-copy">
-        <div class="eyebrow">QUICK START</div>
-        <h1>Build your retro game drive</h1>
-        <p>Start with a curated package, choose your storage, then customize the systems and games.</p>
+        <div class="eyebrow"><span class="status-dot"></span> OMG ARCADE // COLLECTION BUILDER</div>
+        <h1>YOUR GAMES.<br><span>YOUR SYSTEMS.</span><br>YOUR DRIVE.</h1>
+        <p>Start with one of our curated favorites packages, choose your storage, then personalize the collection game by game.</p>
+        <div class="hero-tags"><span>100K+ TITLES</span><span>400+ SYSTEMS</span><span>CUSTOM BUILDS</span></div>
       </div>
       <div class="drive-picker">
         <label for="driveSize">Storage</label>
@@ -37,15 +49,16 @@
         <small>Supported range: 256GB–4TB</small>
       </div>
     </div>
+    <div id="packages" class="package-intro"><div><div class="eyebrow">CURATED COLLECTIONS</div><h2>Choose your starting package</h2></div><p>Pick a base collection and customize it from there.</p></div>
     <div class="package-grid" id="packageGrid">
-      <button class="package-card" data-package="100"><span>TOP</span><strong>100</strong><small>Essential classics</small></button>
-      <button class="package-card" data-package="250"><span>TOP</span><strong>250</strong><small>Expanded favorites</small></button>
-      <button class="package-card featured-package" data-package="500"><span>TOP</span><strong>500</strong><small>Big retro collection</small></button>
-      <button class="package-card" data-package="1000"><span>TOP</span><strong>1000</strong><small>Ultimate favorites pack</small></button>
+      <button class="package-card" data-package="100"><span>STARTER</span><strong>TOP 100</strong><small>The essential classics everybody knows.</small><em>SELECT PACKAGE →</em></button>
+      <button class="package-card" data-package="250"><span>CLASSIC+</span><strong>TOP 250</strong><small>A deeper mix of fan favorites and legends.</small><em>SELECT PACKAGE →</em></button>
+      <button class="package-card featured-package" data-package="500"><span>FAN FAVORITE</span><strong>TOP 500</strong><small>A serious retro collection across major systems.</small><em>SELECT PACKAGE →</em></button>
+      <button class="package-card" data-package="1000"><span>ULTIMATE</span><strong>TOP 1000</strong><small>Our biggest curated favorites collection.</small><em>SELECT PACKAGE →</em></button>
     </div>
     <div id="packageNote" class="package-note">Packages are a starting point — every game can be added or removed.</div>
 
-    <div class="popular-systems-wrap">
+    <div id="systems" class="popular-systems-wrap">
       <div class="section-heading">
         <div><div class="eyebrow">POPULAR SYSTEMS</div><h2>Jump straight to a favorite</h2></div>
         <button id="showAllSystems" class="secondary">Browse all systems</button>
@@ -54,7 +67,7 @@
     </div>
   </section>
 
-  <main class="shell">
+  <main id="builder" class="shell">
     <aside class="sidebar">
       <div class="sidebar-head">
         <h2>Systems</h2>
@@ -70,9 +83,9 @@
     <section class="content">
       <div class="hero">
         <div>
-          <div class="eyebrow">BUILD YOUR GAME LIST</div>
-          <h1 id="systemTitle">Choose a system</h1>
-          <p id="systemSubtitle">Select a system on the left to browse available titles.</p>
+          <div class="eyebrow">CUSTOMIZE YOUR COLLECTION</div>
+          <h1 id="systemTitle">Choose your system</h1>
+          <p id="systemSubtitle">Pick a system, search its library, then add exactly what you want.</p>
         </div>
         <div class="hero-stat">
           <span id="visibleCount">0</span>
@@ -154,7 +167,43 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <footer class="site-footer">
+    <div><strong>OMG<span>ARCADE</span></strong><small>Built for players who still remember blowing into cartridges.</small></div>
+    <div class="footer-right">OMGTV FAMILY // RETRO COLLECTION BUILDER</div>
+  </footer>
+
   <script src="games-data.js"></script>
   <script src="app.js"></script>
+  <script>
+    (() => {
+      const canvas = document.getElementById('matrixCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const chars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}+-*#';
+      let drops = [], fontSize = 14, raf;
+      const resize = () => {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+        canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        drops = Array(Math.ceil(rect.width/fontSize)).fill(0).map(()=>Math.random()*-40);
+      };
+      const draw = () => {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        ctx.fillStyle='rgba(4,4,4,.10)'; ctx.fillRect(0,0,w,h);
+        ctx.font = fontSize + 'px Azeret Mono, monospace';
+        drops.forEach((y,i)=>{
+          ctx.fillStyle='rgba(0,255,102,' + (0.18 + Math.random()*.22) + ')';
+          ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, y*fontSize);
+          if(y*fontSize>h && Math.random()>.975) drops[i]=0; else drops[i]++;
+        });
+        raf=requestAnimationFrame(draw);
+      };
+      resize(); draw();
+      window.addEventListener('resize', resize);
+      document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelAnimationFrame(raf); else draw(); });
+    })();
+  </script>
 </body>
 </html>
