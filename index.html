@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retro Game Catalog</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-wrap">
+      <div class="logo-mark">RG</div>
+      <div>
+        <div class="brand">Retro Game Catalog</div>
+        <div class="tagline">Choose your systems. Pick your games. Build your list.</div>
+      </div>
+    </div>
+    <button id="orderBtn" class="order-btn">My Selection <span id="orderCount" class="badge">0</span></button>
+  </header>
+
+  <section class="storefront">
+    <div class="storefront-inner">
+      <div class="storefront-copy">
+        <div class="eyebrow">QUICK START</div>
+        <h1>Build your retro game drive</h1>
+        <p>Start with a curated package, choose your storage, then customize the systems and games.</p>
+      </div>
+      <div class="drive-picker">
+        <label for="driveSize">Storage</label>
+        <select id="driveSize">
+          <option value="256">256GB SSD</option>
+          <option value="512">512GB SSD</option>
+          <option value="1024">1TB Drive</option>
+          <option value="2048">2TB Drive</option>
+          <option value="4096">4TB Drive</option>
+        </select>
+        <small>Supported range: 256GB–4TB</small>
+      </div>
+    </div>
+    <div class="package-grid" id="packageGrid">
+      <button class="package-card" data-package="100"><span>TOP</span><strong>100</strong><small>Essential classics</small></button>
+      <button class="package-card" data-package="250"><span>TOP</span><strong>250</strong><small>Expanded favorites</small></button>
+      <button class="package-card featured-package" data-package="500"><span>TOP</span><strong>500</strong><small>Big retro collection</small></button>
+      <button class="package-card" data-package="1000"><span>TOP</span><strong>1000</strong><small>Ultimate favorites pack</small></button>
+    </div>
+    <div id="packageNote" class="package-note">Packages are a starting point — every game can be added or removed.</div>
+
+    <div class="popular-systems-wrap">
+      <div class="section-heading">
+        <div><div class="eyebrow">POPULAR SYSTEMS</div><h2>Jump straight to a favorite</h2></div>
+        <button id="showAllSystems" class="secondary">Browse all systems</button>
+      </div>
+      <div id="popularSystems" class="popular-systems"></div>
+    </div>
+  </section>
+
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <h2>Systems</h2>
+        <span id="systemCount" class="muted"></span>
+      </div>
+      <div class="input-wrap compact">
+        <span class="search-icon">⌕</span>
+        <input id="systemSearch" type="search" placeholder="Search systems..." autocomplete="off" />
+      </div>
+      <div id="systemList" class="system-list"></div>
+    </aside>
+
+    <section class="content">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">BUILD YOUR GAME LIST</div>
+          <h1 id="systemTitle">Choose a system</h1>
+          <p id="systemSubtitle">Select a system on the left to browse available titles.</p>
+        </div>
+        <div class="hero-stat">
+          <span id="visibleCount">0</span>
+          <small>games shown</small>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="input-wrap grow">
+          <span class="search-icon">⌕</span>
+          <input id="gameSearch" type="search" placeholder="Search games, publisher, year..." autocomplete="off" disabled />
+        </div>
+        <select id="categoryFilter" disabled>
+          <option value="">All categories</option>
+        </select>
+        <select id="yearFilter" disabled>
+          <option value="">All years</option>
+        </select>
+        <select id="featuredFilter" disabled>
+          <option value="">All games</option>
+          <option value="popular">⭐ Popular</option>
+          <option value="must">🔥 Must Play</option>
+          <option value="multi">👥 Multiplayer</option>
+        </select>
+        <label class="check-filter"><input id="hideClones" type="checkbox" checked /> Hide clones</label>
+        <button id="selectVisibleBtn" class="secondary" disabled>Select visible</button>
+      </div>
+
+      <div id="emptyState" class="empty-state">
+        <div class="controller">🎮</div>
+        <h3>Start by choosing a system</h3>
+        <p>Your customers can search, filter, and select exactly the games they want.</p>
+      </div>
+
+      <div id="gameGrid" class="game-grid hidden"></div>
+      <div id="pager" class="pager hidden">
+        <button id="prevPage" class="secondary">Previous</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage" class="secondary">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="drawerBackdrop" class="backdrop hidden"></div>
+  <aside id="orderDrawer" class="drawer">
+    <div class="drawer-head">
+      <div>
+        <div class="eyebrow">CUSTOMER ORDER</div>
+        <h2>My Selection</h2>
+      </div>
+      <button id="closeDrawer" class="icon-btn" aria-label="Close">×</button>
+    </div>
+
+    <div class="customer-fields">
+      <input id="customerName" placeholder="Customer name" />
+      <input id="customerContact" placeholder="Phone or email" />
+    </div>
+
+    <div class="order-config-summary">
+      <div><span class="muted">Package</span><strong id="selectedPackage">Custom</strong></div>
+      <div><span class="muted">Storage</span><strong id="selectedDrive">256GB SSD</strong></div>
+    </div>
+
+    <div class="summary-row">
+      <span><strong id="selectedGameCount">0</strong> games</span>
+      <span><strong id="selectedSystemCount">0</strong> systems</span>
+    </div>
+    <div id="storageNotice" class="storage-notice">Exact storage usage requires ROM file-size data.</div>
+
+    <div id="selectedList" class="selected-list"></div>
+
+    <div class="drawer-actions">
+      <button id="copyOrder" class="primary">Copy order</button>
+      <button id="downloadTxt" class="secondary">Download TXT</button>
+      <button id="downloadCsv" class="secondary">Download CSV</button>
+      <button id="clearOrder" class="danger-link">Clear selection</button>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="games-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
